@@ -29,10 +29,18 @@
         <td v-for="(item, index) in specGridHead" :key="index">{{item}}</td>
       </tr>
       <tr v-for="(item, index) in specGridCell" :key="index">
-        <td v-for="(value, key) in item" :key="key">
-          <div v-if="key.includes('field')">{{value}}</div>
-          <input v-if="!key.includes('field')" v-model="item[key]">
+        <td v-for="item in item.propertyList" :key="item.value">
+          <div>{{item.value}}</div>
         </td>
+        <td>
+          <input v-model="item.inventory">
+        </td>
+        <td>
+          <input v-model="item.discount">
+        </td>
+        <td>
+          <input v-model="item.price">
+        </td>                           
         <td>
           <button @click="delSpecGrid(index)">删除规格</button>
         </td>
@@ -112,21 +120,28 @@ export default {
     },
     // 生成规格的全排列函数
     generate(arr) {
-      function mix(arr1, arr2) {
+      function mix(item1, item2) {
+        var arr1 = Array.isArray(item1.valueList) ? item1.valueList : item1;
+        var arr2 = item2.valueList;
         var result = [];
         for (let i = 0; i < arr1.length; i++) {
           for (let j = 0; j < arr2.length; j++) {
-            let item = {};
-            if (typeof arr1[i] === "object") {
-              let keyLength = Object.keys(arr1[i]).length + 1;
-              item = Object.assign({}, arr1[i], {
-                ["field" + keyLength]: arr2[j]
-              });
+            let item = [];
+            if (Array.isArray(arr1[i])) {
+                item = item.concat(arr1[i])
+                item.push({
+                  name: item2.name,
+                  value: arr2[j].name                  
+                })
             } else {
-              item = {
-                field1: arr1[i],
-                field2: arr2[j]
-              };
+              item.push({
+                  name: item1.name,
+                  value: arr1[i].name
+              })
+              item.push({
+                  name: item2.name,
+                  value: arr2[j].name
+              })
             }
             result.push(item);
           }
@@ -134,23 +149,28 @@ export default {
         return result;
       }
       return arr.reduce((acc, item) => {
-        return mix(acc, item);
-      });
+          return mix(acc, item);
+      }); 
     },
     // 生成规格
     generateSpec() {
+      // 获取规格表头
       this.specGridHead = this.specList
         .map(item => item.name)
         .concat(this.specGridHeadPreset);
-      // this.specGridCell
+      
+      
+      // 过滤空白的规格
       let normlizeList = this.specList.map(item => {
-        return item.valueList
-          .filter(value => value.name)
-          .map(value => value.name);
+        return {
+          name: item.name,
+          valueList: item.valueList.filter(value => value.name)
+        }
       });
+      // 获取规格数据
       this.specGridCell = this.generate(normlizeList).map(item => {
         return {
-          ...item,
+          propertyList: item,
           inventory: "",
           discount: "",
           price: ""
@@ -162,7 +182,7 @@ export default {
     },
     submit() {
       // eslint-disable-next-line
-      console.log(this.specGridCell);
+      console.log(JSON.stringify(this.specGridCell, null, 2));
     }
   }
 };
