@@ -54,36 +54,37 @@
 export default {
   name: "demo",
 
+  props: {
+    data: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+    specListProp: {
+      type: Array,
+      default () {
+        return []
+      }
+    },    
+  },
+
   data() {
     return {
-      specList: [
-        {
-          name: "份数大小",
-          valueList: [
-            {
-              name: "大"
-            },
-            {
-              name: "小"
-            }
-          ]
-        },
-        {
-          name: "微辣",
-          valueList: [
-            {
-              name: "特辣"
-            },
-            {
-              name: "微辣"
-            }
-          ]
-        }
-      ],
+      specList: this.specListProp,
       specGridHeadPreset: ["库存", "折扣价", "价格", "操作"],
       specGridHead: [],
-      specGridCell: []
+      specGridCell: this.data,
     };
+  },
+
+  watch: {
+    data () {
+      this.specGridCell = this.data
+    },
+    specList () {
+      this.specList = this.specListProp
+    }
   },
 
   methods: {
