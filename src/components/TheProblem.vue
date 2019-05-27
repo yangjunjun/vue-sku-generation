@@ -33,13 +33,13 @@
           <div>{{item.value}}</div>
         </td>
         <td>
-          <input v-model="item.inventory">
+          <input v-model="item.inventory" type="number" :min="0">
         </td>
         <td>
-          <input v-model="item.discount">
+          <input v-model="item.discount" type="number" :min="0">
         </td>
         <td>
-          <input v-model="item.price">
+          <input v-model="item.price" type="number" :min="item.discount">
         </td>                           
         <td>
           <button @click="delSpecGrid(index)">删除规格</button>
@@ -128,29 +128,43 @@ export default {
           for (let j = 0; j < arr2.length; j++) {
             let item = [];
             if (Array.isArray(arr1[i])) {
-                item = item.concat(arr1[i])
-                item.push({
-                  name: item2.name,
-                  value: arr2[j].name                  
-                })
+              item = item.concat(arr1[i]);
+              item.push({
+                name: item2.name,
+                value: arr2[j].name
+              });
             } else {
               item.push({
-                  name: item1.name,
-                  value: arr1[i].name
-              })
+                name: item1.name,
+                value: arr1[i].name
+              });
               item.push({
-                  name: item2.name,
-                  value: arr2[j].name
-              })
+                name: item2.name,
+                value: arr2[j].name
+              });
             }
             result.push(item);
           }
         }
         return result;
       }
-      return arr.reduce((acc, item) => {
+      if (arr.length < 1) {
+        return [];
+      } else if (arr.length < 2) {
+          let result = [];
+          let item = arr[0];
+          item.valueList.map(value => {
+            result.push([{
+              name: item.name,
+              value: value.name
+            }]);
+          });
+          return result;
+      } else {
+        return arr.reduce((acc, item) => {
           return mix(acc, item);
-      }); 
+        });
+      }
     },
     // 生成规格
     generateSpec() {
