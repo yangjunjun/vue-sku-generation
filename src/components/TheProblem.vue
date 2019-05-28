@@ -73,9 +73,16 @@ export default {
     return {
       specList: this.specListProp,
       specGridHeadPreset: ["库存", "折扣价", "价格", "操作"],
-      specGridHead: [],
       specGridCell: this.data,
     };
+  },
+
+  computed: {
+    specGridHead () {
+      return this.specList
+        .map(item => item.name)
+        .concat(this.specGridHeadPreset);
+    }
   },
 
   watch: {
@@ -169,12 +176,7 @@ export default {
     },
     // 生成规格
     generateSpec() {
-      // 获取规格表头
-      this.specGridHead = this.specList
-        .map(item => item.name)
-        .concat(this.specGridHeadPreset);
-      
-      
+
       // 过滤空白的规格
       let normlizeList = this.specList.map(item => {
         return {
